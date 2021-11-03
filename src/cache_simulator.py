@@ -7,7 +7,7 @@ def main():
     #Set up our arguments
     parser = argparse.ArgumentParser(description='Simulate a cache')
     parser.add_argument('-c','--config-file', help='Configuration file for the memory heirarchy', required=False, default='configs/config_simple_multilevel')
-    parser.add_argument('-t', '--trace-file', help='Tracefile containing instructions', required=False, default='traces/trace2.txt')
+    parser.add_argument('-t', '--trace-file', help='Tracefile containing instructions', required=False, default='traces/simple.txt')
     parser.add_argument('-l', '--log-file', help='Log file name', required=False)
     parser.add_argument('-p', '--pretty', help='Use pretty colors', required=False, action='store_true')
     parser.add_argument('-d', '--draw-cache', help='Draw cache layouts', required=False, action='store_true')
@@ -24,7 +24,7 @@ def main():
     with open(log_filename, 'w'):
         pass
 
-    logger = logging.getLogger()
+    logger = logging.getLogger()    # 로그 출력하기 
     fh = logging.FileHandler(log_filename)
     sh = logging.StreamHandler()
     logger.addHandler(fh)
@@ -179,11 +179,15 @@ def compute_amat(level, responses, logger, results={}):
 
 def build_hierarchy(configs, logger):
     #Build the cache hierarchy with the given configuration
-    hierarchy = {}
+    hierarchy = {} # 캐시 계층 만들기 1level, 2level etc...
     #Main memory is required
     main_memory = build_cache(configs, 'mem', None, logger)
     prev_level = main_memory
     hierarchy['mem'] = main_memory
+    if 'cache_4' in configs.keys():
+        cache_4 = build_cache(configs, 'cache_4', prev_level, logger)
+        prev_level = cache_4
+        hierarchy['cache_4'] = cache_4
     if 'cache_3' in configs.keys():
         cache_3 = build_cache(configs, 'cache_3', prev_level, logger)
         prev_level = cache_3
@@ -199,15 +203,15 @@ def build_hierarchy(configs, logger):
 
 def build_cache(configs, name, next_level_cache, logger):
     return cache.Cache(name,
-                configs['architecture']['word_size'],
-                configs['architecture']['block_size'],
-                configs[name]['blocks'] if (name != 'mem') else -1,
-                configs[name]['associativity'] if (name != 'mem') else -1,
+                configs['architecture']['word_size'],   # 컴퓨터에서 데이터를 처리하는 기본 단위
+                configs['architecture']['block_size'],  # 운영 체제 또는 프로그램이 기억공간을 임의적으로 분할하여 사용하는 하나의 단위
+                configs[name]['blocks'] if (name != 'mem') else -1, # 블록의 수 
+                configs[name]['associativity'] if (name != 'mem') else -1,   # 몇 way assiciativity 인지
                 configs[name]['hit_time'],
                 configs[name]['hit_time'],
-                configs['architecture']['write_back'],
-                logger,
-                next_level_cache)
+                configs['architecture']['write_back'], # write back이면 캐시만 업데이트, write through면 캐시와 메모리 모두 업데이트
+                logger,     # 로그 파일 저장 그거 
+                next_level_cache) # 이전 레벨의 캐시는 무엇인지 
 
 
 if __name__ == '__main__':

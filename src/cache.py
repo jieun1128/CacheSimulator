@@ -28,7 +28,7 @@ class Cache:
         self.block_offset_size = int(math.log(self.block_size, 2))
         self.index_size = int(math.log(self.n_sets, 2))
 
-        #Initialize the data dictionary
+        #Initialize the data dictionary, cache에 저장될 데이터 리스트 
         if next_level:
             for i in range(int(self.n_sets)):
                 index = str(bin(i))[2:].zfill(self.index_size)
@@ -53,6 +53,7 @@ class Cache:
             #If this tag exists in the set, this is a hit
             if tag in in_cache:
                 r = response.Response({self.name:True}, self.hit_time)
+                self.data[index][tag].last_accessed = current_step   # LRU  - hit 발생시 last_accessed를 현재 step으로 업데이트
             else:
                 #Read from the next level of memory
                 r = self.next_level.read(address, current_step)
@@ -63,9 +64,9 @@ class Cache:
                     self.data[index][tag] = block.Block(self.block_size, current_step, False, address)
                 else:
                     #Find the oldest block and replace it
-                    oldest_tag = list(in_cache)[0] 
-                    for b in in_cache:
-                        if self.data[index][b].last_accessed < self.data[index][oldest_tag].last_accessed:
+                    oldest_tag = list(in_cache)[0] # 제일 오래된 캐시의 값을 일단 제일 처음의 값으로 초기화 
+                    for b in in_cache: # 반복문을 돌면서 제일 오래된 캐시의 값을 찾기 
+                        if self.data[index][b].last_accessed < self.data[index][oldest_tag].last_accessed: 
                             oldest_tag = b
                     #Write the block back down if it's dirty and we're using write back
                     if self.write_back:
