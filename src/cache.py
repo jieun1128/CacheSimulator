@@ -30,7 +30,7 @@ class Cache:
 
         #Initialize the data dictionary
         if next_level:
-            for i in range(self.n_sets):
+            for i in range(int(self.n_sets)):
                 index = str(bin(i))[2:].zfill(self.index_size)
                 if index == '':
                     index = '0'
@@ -63,7 +63,7 @@ class Cache:
                     self.data[index][tag] = block.Block(self.block_size, current_step, False, address)
                 else:
                     #Find the oldest block and replace it
-                    oldest_tag = in_cache[0] 
+                    oldest_tag = list(in_cache)[0] 
                     for b in in_cache:
                         if self.data[index][b].last_accessed < self.data[index][oldest_tag].last_accessed:
                             oldest_tag = b
@@ -114,7 +114,7 @@ class Cache:
             
             elif len(in_cache) == self.associativity:
                 #If this set is full, find the oldest block, write it back if it's dirty, and replace it
-                oldest_tag = in_cache[0]
+                oldest_tag = list(in_cache)[0]
                 for b in in_cache:
                     if self.data[index][b].last_accessed < self.data[index][oldest_tag].last_accessed:
                         oldest_tag = b

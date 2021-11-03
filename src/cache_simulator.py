@@ -6,8 +6,8 @@ from terminaltables.other_tables import UnixTable
 def main():
     #Set up our arguments
     parser = argparse.ArgumentParser(description='Simulate a cache')
-    parser.add_argument('-c','--config-file', help='Configuration file for the memory heirarchy', required=True)
-    parser.add_argument('-t', '--trace-file', help='Tracefile containing instructions', required=True)
+    parser.add_argument('-c','--config-file', help='Configuration file for the memory heirarchy', required=False, default='configs/config_simple_multilevel')
+    parser.add_argument('-t', '--trace-file', help='Tracefile containing instructions', required=False, default='traces/trace2.txt')
     parser.add_argument('-l', '--log-file', help='Log file name', required=False)
     parser.add_argument('-p', '--pretty', help='Use pretty colors', required=False, action='store_true')
     parser.add_argument('-d', '--draw-cache', help='Draw cache layouts', required=False, action='store_true')
@@ -62,7 +62,7 @@ def print_cache(cache):
     sets = []
     set_indexes = sorted(cache.data.keys())
     if len(cache.data.keys()) > 0:
-        first_key = cache.data.keys()[0]
+        first_key = list(cache.data.keys())[0]
         way_no = 0
         
         #Label the columns
@@ -103,8 +103,8 @@ def print_cache(cache):
         table = UnixTable(sets)
         table.title = cache.name
         table.inner_row_border = True
-        print "\n"
-        print table.table
+        print ("\n")
+        print (table.table)
 
 #Loop through the instructions in the tracefile and use
 #the given memory hierarchy to find AMAT
